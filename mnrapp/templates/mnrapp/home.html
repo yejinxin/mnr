@@ -1,0 +1,31 @@
+{% extends 'page.html' %}
+{% load staticfiles %}
+
+{% block titile %}Home{% endblock %}
+
+{% block head %}
+<link href="{% static 'css/home.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-header">
+{% if user.is_authenticated %}
+    Hello {{ user }}
+{% else %}
+    Hello world
+{% endif %}
+</h2>
+
+
+<div class="site-wrapper-inner">
+        <div class="cover-container">
+          <div class="inner cover">
+            <p class="lead">MNR's Not RSP. Man Never Rests, Modification Now Ready.<br> Best advertising Place holder on sale. Buy it, winner. Miss it, loser! <br> 广告位招租，名额有限，先到先得，欲购从速！</p>
+            <p class="lead">
+              <a href="{% url 'contact' %}" class="btn btn-lg btn-info">Contact Us</a>
+            </p>
+          </div>
+        </div>
+</div>
+{% endblock %}

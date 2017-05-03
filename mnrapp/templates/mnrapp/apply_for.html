@@ -1,0 +1,172 @@
+{% extends 'page.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block head %}
+<script src="{% static 'js/jquery.formset.js' %}"></script>
+<script type="text/javascript">
+    $(function() {
+        $(".inline.{{ mods_formset.prefix }}").formset({
+            prefix: "{{ mods_formset.prefix }}",
+            formCssClass: "dynamic-formset-mods",
+            added: function(row){
+                $(row).find("input.acinput").autocomplete(acparam);
+{% if form.get_type == 'ROOT' %}
+                $(row).find("input.root_user").val('root');
+                $(row).find("input.new_pass").val('rootroot');
+{% endif %}
+            },
+            //extraClasses: ["myExtraClass",],
+        })
+    /*    $(".inline.{{ review_form.prefix }}").formset({
+            prefix: "{{ review_form.prefix }}",
+        })*/
+    })
+</script>
+
+{% endblock %}
+
+{% block content %}
+<h2 class="page-header">{{ title }}</h2>
+<form method="post" role="form" action="">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+ 
+    <legend>Modifications</legend>
+    <table class="table">
+        {{ mods_formset.management_form }}
+        {{ mods_formset.non_form_errors }}
+        <thead>
+            <tr>
+              <td><label class="control-label">Host</label></td>
+              <td><label class="control-label">Production IP</label></td>
+              <td><label class="control-label">Management IP</label></td>
+              {% if form.get_type == 'ROOT' %}
+              <td><label class="control-label">User</label></td>
+              <td><label class="control-label">Password</label></td>
+              {% elif form.get_type == 'DISK' %}
+              <td><label class="control-label">FileSystem</label></td>
+              <td><label class="control-label">Size GB</label></td>
+              {% elif form.get_type == 'CPUMEM' %}
+              <td><label class="control-label">CpuNum original</label></td>
+              <td><label class="control-label">CpuNum new</label></td>
+              <td><label class="control-label">MemoryGB original</label></td>
+              <td><label class="control-label">MemoryGB new</label></td>
+              {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for mform in mods_formset %}
+            <tr class="form-inline inline {{ mods_formset.prefix }}">
+              {% bootstrap_form_errors mform 'non_fields' %}
+              {% for field in mform.hidden_fields %}
+                  {% bootstrap_field field %}
+              {% endfor %}
+              {% for field in mform.visible_fields %}
+                  <td>{% bootstrap_field field show_label=False %}</td>
+              {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br>
+{% if action == 'REVIEW' %}
+    <input type="hidden" id="review" name="review" value="default" />
+    <button type="submit" id="btn_approve" data-loading-text="submiting" class="btn btn-primary" onclick="return confirm('Do you really want to approve the application now?');">Approve</button>
+    <button type="submit" id="btn_reject" data-loading-text="submiting" class="btn btn-warning" onclick="return confirm('Do you really want to reject the application?');"> Reject </button>
+{% else %}
+    <button type="submit" class="btn btn-primary">Submit</button>
+{% endif %}
+</form>
+{% endblock %}
+
+{% block BODY_END %}
+<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}" type="text/css" />
+<link rel="stylesheet" type="text/css" href="{% static 'css/jquery.datetimepicker.css' %}"/ >
+<script src="{% static 'js/jquery-ui.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/jquery.datetimepicker.full.min.js' %}"></script>
+ 
+<script type="text/javascript">
+    var acparam = {
+        minLength: 4,
+        source: function(request, response){
+            $.ajax({
+                url: "{% url 'api_hostinfo' %}",
+                dataType: "json",
+                data: {q: request.term},
+                success: function(data){
+                    if(data.num == 0){
+                        response([{'id': -1, 'host': 'No records found', 'prod_ip': '', 'mng_ip': '', 'sys': '', 'desp': ''}, ]);
+                    }else{
+                        response(data.objs);
+                    }
+                },
+            });
+        },
+//        focus: function( event, ui ) {
+//              $(this).val(ui.item.prod_ip );
+//              return false;
+//        },
+        select: function(event, ui){
+            if(ui.item.id == -1){
+                return false;
+            }
+            var acparent = $(this).parent().parent().parent();
+            $(acparent).find("input.achost").val(ui.item.host);
+            $(acparent).find("input.acprod_ip").val(ui.item.prod_ip);
+            $(acparent).find("input.acmng_ip").val(ui.item.mng_ip);
+            return false;
+        },
+        create: function(){
+            $(this).data('ui-autocomplete')._renderItem = function(ul, item){
+                return $( "<li>" )
+                  .append( "<div>" + item.host + " - " + item.prod_ip + " - " + item.mng_ip + " - " + item.sys + " - " + item.desp + "</div>" )
+                  .appendTo( ul );
+            }
+        },
+    };
+{% if form.get_type == 'ROOT' %}
+    function root_user_change(obj){
+        var new_pass = $(obj).parent().parent().parent().find("td div input.new_pass");
+        //console.log('new pass is ' + $(new_pass).val());
+        if($(obj).val() == 'root'){
+            $(new_pass).val('rootroot');
+            $(new_pass).attr('readonly', 'readonly');
+        }else{
+            $(new_pass).removeAttr('readonly');
+        }
+    }; 
+{% endif %}
+    $( function() {
+        $(".expire_time").datetimepicker({
+            format: 'Y-m-d H:i',
+            minDate: '{% now "Y-m-d" %}',
+            minTime: '{% now "H:i" %}',
+            startDate: '{% now "Y-m-d" %}',
+        });
+{% if form.get_type == 'ROOT' %}
+        $('input.root_user').each(function(){
+            root_user_change(this);
+        });
+{% endif %}
+
+{% if action == 'REVIEW' %}
+        $('#btn_approve').on('click', function () {
+          $('#review').val("PASSED");
+          return 0
+        })
+        $('#btn_reject').on('click', function () {
+          $('#review').val("REJECTED");
+          return 0
+        })
+{% endif %}
+        $(".dynamic-formset-mods input.acinput").autocomplete(acparam);
+    } );
+</script>
+{% endblock %}
+
+
+
+

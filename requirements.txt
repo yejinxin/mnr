@@ -1,0 +1,6 @@
+Django==1.10.6
+django-bootstrap3==8.2.1
+paramiko==2.1.2
+pytz==2016.10
+pywinrm==0.2.2
+requests==2.13.0

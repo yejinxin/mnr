@@ -1,0 +1,13 @@
+#copy this help function to ~/.bashrc
+
+workon()
+{
+    if [ "x$1" = "x" ]; then
+        echo "workon [dev|prod]"
+    elif [ "$1" = "dev" ]; then
+        . /path/to/dev/bin/activate && export VENV="dev" 
+    elif [ "$1" = "prod" ]; then
+        . /path/to/prod/bin/activate && export VENV="prod"
+    fi
+}
+

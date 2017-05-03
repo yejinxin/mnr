@@ -1,0 +1,117 @@
+{% extends 'page.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{% block title %}Application Detail{% endblock %}
+
+{% block head %}{% endblock %}
+
+{% block content %}
+<h2 class="page-header">Application Detail </h2>
+
+<!--<dl class="dl-horizontal" style="font-size: 18px;">-->
+<dl class="dl-horizontal bg-info">
+    <dt>Application type</dt>
+    <dd>{{ application.type }}</dd>
+    <dt>Applicant</dt>
+    <dd>{{ application.applicant }}</dd>
+    <dt>Apply time</dt>
+    <dd>{{ application.apply_time }}</dd>
+    <dt>Status</dt>
+    <dd>{{ application.status }}</dd>
+    {% if application.recoverable %}
+        <dt>Auto recover</dt>
+        <dd>{{ application.autorecover }}</dd>
+        <dt>Expire time</dt>
+        <dd>{{ application.expire_time }} 
+            {% if application.status == 'DONE' %}{% if request.user.is_staff or request.user == application.applicant %}
+                <a href="#myModal" role="button" class="btn btn-large btn-primary" data-toggle="modal">Recover now</a>
+                <!-- Modal HTML -->
+                <div id="myModal" class="modal fade">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Confirmation</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>Do you really want to recover now?</p>
+                                {% if application.type == 'CPUMEM' %}
+                                    <p class="text-warning"><small>Recovering VM CPU/MEMORY may need OS reboot.</small></p>
+                                {% endif %}
+                            </div>
+                            <form action="{% url 'application_recover' pk=application.pk %}" method="post">
+                            {% csrf_token %}
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Recover now</button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}{% endif %}
+        </dd>
+    {% endif %}
+    <dt>Apply name</dt>
+    <dd>{{ application.apply_name }}</dd>
+    <dt>Apply description</dt>
+    <dd>{{ application.apply_desp }}</dd>
+</dl>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+          <tr class="bg-info">
+            <td>OS type</td>
+            <td>Host</td>
+            <td>Production IP</td>
+            <td>Management IP</td>
+            <td>Status</td>
+            {% if application.type == "ROOT" %}
+                <td>User</td>
+                <td>Password</td>
+            {% elif application.type == "DISK" %}
+                <td>Filesystem</td>
+                <td>Size(GB)</td>
+            {% elif application.type == "CPUMEM" %}
+                <td>CpuNum original</td>
+                <td>CpuNum new</td>
+                <td>MemoryGB original</td>
+                <td>MemoryGB new</td>
+            {% endif %}
+            <td>Message</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for mod in application.modifications.all %}
+          <tr class="{% if mod.status == 'ERROR' %}danger{% elif mod.status == 'DONE' or mod.status == 'FINISHED' %}success{% endif %}">
+            <td>{{ mod.os_type }}</td>
+            <td>{{ mod.host }}</td>
+            <td>{{ mod.prod_ip }}</td>
+            <td>{{ mod.mng_ip }}</td>
+            <td>{{ mod.status }}</td>
+            {% if mod.type == "ROOT" %}
+                <td>{{ mod.user }}</td>
+                <td>{{ mod.password }}</td>
+            {% elif mod.type == "DISK" %}
+                <td>{{ mod.fs }}</td>
+                <td>{{ mod.size }} GB</td>
+            {% elif mod.type == "CPUMEM" %}
+                <td>{{ mod.cpu_ori }}</td>
+                <td>{{ mod.cpu_new }}</td>
+                <td>{{ mod.mem_ori }}</td>
+                <td>{{ mod.mem_new }}</td>
+            {% endif %}
+            <td>{{ mod.message }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="form-group">
+    {% for review in application.reviews.all %}
+        <span class="help-block bg-info"><div class="help-block">{{ review.get_description }}</div></span>
+    {% endfor %}
+</div>
+
+{% endblock %}

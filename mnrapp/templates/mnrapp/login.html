@@ -1,0 +1,47 @@
+<html>
+<head>
+<title>MNR Login</title>
+{% load staticfiles %}
+<link href="{% static 'css/login.css' %}" rel="stylesheet">
+<script src="{% static 'jquery-3.2.0.min.js' %}"></script>
+{% load bootstrap3 %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+</head>
+<body>
+<div class="container">
+<!--{% if form.errors %}
+<p>Your username and password didn't match. Please try again.</p>
+{% endif %}
+-->
+
+
+<form method="post" action="" class="form-signin">
+<!--{% bootstrap_form_errors form layout='inline' %}-->
+{% if next %}
+    <div class="alert alert-warning" role="alert">
+    {% if user.is_authenticated %}
+    <p>Your account doesn't have access to this page. To proceed,
+    please login with an account that has access.</p>
+    {% else %}
+    <p>Please login to see this page.</p>
+    {% endif %}
+    </div>
+{% endif %}
+
+<h2>Please Login MNR</h2>
+{% csrf_token %}
+{% bootstrap_form form %}
+{% buttons %}
+    <button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
+{% endbuttons %}
+<div class="alert alert-info" role="alert">
+    Username/Password is consistent with RSP/FLPM ones.
+    For God's sake, please use modern browsers like Chrome, Firefox, IE9+.
+</div>
+</form>
+</div>
+</body>
+</html>

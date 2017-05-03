@@ -1,0 +1,11 @@
+{% extends 'page.html' %}
+{% load staticfiles %}
+
+{% block title %}Profile of {{ user.username }}{% endblock %}
+
+{% block content %}
+<h2 class="page-header">Profile of {{ user.username }}</h2>
+</div>
+<p class="info">{{ prefix }} made {{ user.applications.count }} applications.</p>
+</div>
+{% endblock %}

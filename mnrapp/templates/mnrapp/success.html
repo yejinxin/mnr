@@ -1,0 +1,9 @@
+{% extends 'single.html' %}
+{% block head %}<meta http-equiv="refresh" content="5;url='{% url 'application' %}" />{% endblock %}
+{% block title %}Operation done successfully{% endblock %}
+{% block content %}
+<div class="alert alert-success" role="alert">
+        <strong>{{ message }}</strong>
+</div>
+<h3>Redirecting in 5 seconds...</h3>
+{% endblock %}

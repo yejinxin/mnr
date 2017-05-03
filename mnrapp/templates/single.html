@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block base_content %}
+<div class="container-fluid">
+<div class="row">
+<div class="col-md-8 col-md-offset-2 main">
+  <div class="jumbotron">
+  {% block content %}{% endblock %}
+  </div>
+</div>
+</div>
+</div>
+{% endblock %}

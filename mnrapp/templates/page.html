@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block base_content %}
+<div class="container-fluid">
+<div class="row">
+    <div class="col-xs-2">
+      <div class="sidebar">
+        <ul class="nav nav-sidebar">
+        <!--<ul class="nav nav-pills nav-stacked">-->
+          <!--<li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>-->
+          <li><a href="{% url 'application' %}">Application</a></li>
+          <li><a href="{% url 'apply_root' %}">Apply for Root</a></li>
+          <li><a href="{% url 'apply_disk' %}">Apply for Linux disk</a></li>
+          <li><a href="{% url 'apply_cpumem' %}">Apply for VM cpu/mem</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-xs-10">
+      <div class="main">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+</div>
+</div>
+{% endblock %}

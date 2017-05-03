@@ -1,0 +1,17 @@
+{% extends 'single.html' %}
+{% block title %}Contact{% endblock %}
+{% block head %}
+{% load bootstrap3 %}
+{% bootstrap_messages %}
+{% endblock %}
+{% block content %}
+<p>Hello {{ user.get_short_name }}~ Write down your message, and it will be mailed to us.</>
+<form class="form" action="" method="post">{% csrf_token %}
+    {% bootstrap_form form %}
+    {% buttons %}
+      <button type="submit" class="btn btn-primary">
+        {% bootstrap_icon "star" %} Submit
+      </button>
+    {% endbuttons %}
+</form>
+{% endblock %}
