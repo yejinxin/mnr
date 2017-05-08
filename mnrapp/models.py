@@ -151,9 +151,11 @@ class Application(models.Model):
                     error_flag = True
             if done_flag:
                 self.status = 'FINISHED'
+                self.save()
+                self.mail_finished()
             if error_flag:
                 self.status = 'ERROR'
-            self.save()
+                self.save()
         elif status is None:
             raise Exception("Not implemented")
 

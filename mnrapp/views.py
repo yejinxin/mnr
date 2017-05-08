@@ -427,6 +427,7 @@ class RecoverNowView(LoginRequiredMixin, View):
         if not request.user.is_staff and request.user != app.applicant:
             return HttpResponseForbidden('403 FORBIDDEN')
         call_mc('recover %s' % app.pk)
-        return HttpResponseRedirect(reverse_lazy('application_detail', args=(app.pk,)))
+        #return HttpResponseRedirect(reverse_lazy('application_detail', args=(app.pk,)))
+        return render_to_response('mnrapp/success.html', {'message': 'Recover operation success!'})
 
 
